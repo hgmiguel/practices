@@ -1,0 +1,21 @@
+version: 2
+services:
+  webserver:
+    hostname: woocommerce
+    image: agrothberg/docker-woocommerce
+    links:
+    - dbserver:mysql
+    ports:
+    - 8080:80
+    mem_limit: 521666560
+    cpu_shares: 100
+
+  dbserver:
+    hostname: woomariadb
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    ports:
+    - 3307:3306
+    mem_limit: 521666560
+    cpu_shares: 100
