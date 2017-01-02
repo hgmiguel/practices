@@ -1,14 +1,18 @@
-version: 2
+version: '2'
 services:
   webserver:
     hostname: woocommerce
-    image: agrothberg/docker-woocommerce
+    image: shipbeat/woocommerce
+    environment:
+      WORDPRESS_DB_PASSWORD: example
     links:
-    - dbserver:mysql
+      - dbserver:mysql
     ports:
-    - 8080:80
+      - 8080:80
     mem_limit: 521666560
     cpu_shares: 100
+    volumes:
+      - wordpress:/var/www/html
 
   dbserver:
     hostname: woomariadb
@@ -16,6 +20,9 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: example
     ports:
-    - 3307:3306
+      - 3307:3306
     mem_limit: 521666560
     cpu_shares: 100
+
+volumes:
+  wordpress:
