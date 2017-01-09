@@ -1,0 +1,3 @@
+FROM agrothberg/docker-woocommerce:latest
+
+COPY config/wp-config-dev.php /var/www/wp-config.php
