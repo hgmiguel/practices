@@ -1,3 +1,15 @@
 FROM agrothberg/docker-woocommerce:latest
 
-COPY config/wp-config-dev.php /var/www/wp-config.php
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends unzip wget \
+    && wget http://downloads.wordpress.org/plugin/updraftplus.1.7.41.zip -O /tmp/temp.zip \
+    && cd /usr/src/wordpress/wp-content/plugins \
+    && unzip /tmp/temp.zip \
+    && rm /tmp/temp.zip \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir /usr/src/wordpress/wp-content/updraft/ \
+    && chown -R www-data:www-data /usr/src/wordpress \
+    && chmod 755 /usr/src/wordpress/wp-content/updraft/ 
+
+COPY config/wp-config-dev.php /src/wordpress/wp-config.php
+
