@@ -14,7 +14,7 @@ aws deploy create-deployment-group \
   --deployment-group-name RegalosYDetallesDiamante_DepGroup \
   --deployment-config-name CodeDeployDefault.OneAtATime \
   --ec2-tag-filters Key=Name,Value=RegalosYDetallesDiamante,Type=KEY_AND_VALUE \
-  --service-role-arn arn:aws:iam::408460586533:role/RegalosYDetallesDiamante-CodeDeployTrustRole-19F0YAFFJIRUM \
+  --service-role-arn {{OUTPUT CLOUDFORMATION CodeDeployTrustRoleARN	}} \
   --profile=hgmiguel
 #####
 
@@ -38,8 +38,19 @@ aws deploy create-deployment \
   --application-name RegalosYDetallesDiamante \
   --deployment-config-name CodeDeployDefault.OneAtATime \
   --deployment-group-name RegalosYDetallesDiamante_DepGroup \
-  --s3-location bucket=hgmiguel.regalosydetallesdiamante,bundleType=zip,key=RegalosYDetallesDiamante.zip \
+  --s3-location bucket=hgmiguel.regalosydetallesdiamante,bundleType=zip,key=RegalosYDetallesDiamante.zip,version=0.0.1 \
+  --profile=hgmiguel
+
+aws deploy create-deployment \
+  --application-name RegalosYDetallesDiamante \
+  --s3-location bucket=hgmiguel.regalosydetallesdiamante,key=RegalosYDetallesDiamante.zip,bundleType=zip,eTag=b98c8e63b8f197eaf333806d4b9b44f8-2 \
+  --deployment-group-name RegalosYDetallesDiamante_DepGroup \
+  --deployment-config-name CodeDeployDefault.OneAtATime \
   --profile=hgmiguel
 
 
+aws deploy push \
+  --application-name RegalosYDetallesDiamante \
+  --s3-location s3://hgmiguel.regalosydetallesdiamante/RegalosYDetallesDiamante.zip \
+  --profile=hgmiguel
 
