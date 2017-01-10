@@ -43,7 +43,7 @@ aws deploy create-deployment \
 
 aws deploy create-deployment \
   --application-name RegalosYDetallesDiamante \
-  --s3-location bucket=hgmiguel.regalosydetallesdiamante,key=RegalosYDetallesDiamante.zip,bundleType=zip,eTag=b98c8e63b8f197eaf333806d4b9b44f8-2 \
+  --s3-location bucket=hgmiguel.regalosydetallesdiamante,key=RegalosYDetallesDiamante.zip,bundleType=zip,eTag=a0fde6a56f3205e051b22234bd45bfa3-5 \
   --deployment-group-name RegalosYDetallesDiamante_DepGroup \
   --deployment-config-name CodeDeployDefault.OneAtATime \
   --profile=hgmiguel
@@ -54,3 +54,5 @@ aws deploy push \
   --s3-location s3://hgmiguel.regalosydetallesdiamante/RegalosYDetallesDiamante.zip \
   --profile=hgmiguel
 
+
+### /opt/codedeploy-agent/deployment-root and /var/log/ 

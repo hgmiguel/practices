@@ -215,6 +215,12 @@ Resources:
           Ref: TagKey
         Value:
           Ref: TagValue
+      - Key: CostCenter
+        Value: regalosydetallesdiamante
+      - Key: Stack
+        Value: test
+      - Key: App
+        Value: RegalosYDetallesDiamante
       UserData:
         Fn::Base64:
           Fn::Join:
