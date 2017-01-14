@@ -1,0 +1,722 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Conditions:
+  LaunchInstance2:
+    Fn::Or:
+    - Fn::Equals:
+      - '2'
+      - Ref: InstanceCount
+    - Fn::Equals:
+      - '3'
+      - Ref: InstanceCount
+  LaunchInstance3:
+    Fn::Equals:
+    - '3'
+    - Ref: InstanceCount
+  LaunchLinuxEC2Instance1:
+    Fn::Equals:
+    - Ref: OperatingSystem
+    - Linux
+  LaunchLinuxEC2Instance2:
+    Fn::And:
+    - Condition: LaunchLinuxEC2Instance1
+    - Condition: LaunchInstance2
+  LaunchLinuxEC2Instance3:
+    Fn::And:
+    - Condition: LaunchLinuxEC2Instance1
+    - Condition: LaunchInstance3
+  LaunchWindowsEC2Instance1:
+    Fn::Equals:
+    - Ref: OperatingSystem
+    - Windows
+  LaunchWindowsEC2Instance2:
+    Fn::And:
+    - Condition: LaunchWindowsEC2Instance1
+    - Condition: LaunchInstance2
+  LaunchWindowsEC2Instance3:
+    Fn::And:
+    - Condition: LaunchWindowsEC2Instance1
+    - Condition: LaunchInstance3
+Description: 'Create instances ready for CodeDeploy: Create up to 3 Amazon EC2 instances
+  with an associated instance profile and install the AWS CodeDeploy Agent. **WARNING**
+  This template creates one or more Amazon EC2 instances. You will be billed for the
+  AWS resources used if you create a stack from this template. Copyright [2012-2014]
+  Amazon.com, Inc. or its affiliates. All Rights Reserved. Licensed under the Apache
+  License, Version 2.0 (the "License"). You may not use this file except in compliance
+  with the License. A copy of the License is located at http://aws.amazon.com/apache2.0/
+  or in the "license" file accompanying this file. This file is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and limitations
+  under the License.'
+Mappings:
+  OS2SSHPort:
+    Linux:
+      SSHPort: '22'
+    Windows:
+      SSHPort: '3389'
+  RegionOS2AMI:
+    us-east-1:
+      Linux: ami-246ed34c
+      Windows: ami-ac3a1cc4
+    us-west-2:
+      Linux: ami-55a7ea65
+      Windows: ami-7f634e4f
+Outputs:
+  CodeDeployTrustRoleARN:
+    Value:
+      Fn::GetAtt:
+      - CodeDeployTrustRole
+      - Arn
+Parameters:
+  InstanceCount:
+    ConstraintDescription: Must be a number between 1 and 3.
+    Default: '1'
+    Description: Number of Amazon EC2 instances (Must be a number between 1 and 3).
+    MaxValue: '3'
+    MinValue: '1'
+    Type: Number
+  InstanceType:
+    ConstraintDescription: Must be a valid Amazon EC2 instance type.
+    Default: t1.micro
+    Description: Amazon EC2 instance type.
+    Type: String
+  KeyPairName:
+    AllowedPattern: '[\x20-\x7E]*'
+    ConstraintDescription: KeyPairName is a required Field and can contain only ASCII
+      characters.
+    Description: Name of an existing Amazon EC2 key pair to enable SSH or RDP access
+      to the instances.
+    MaxLength: '255'
+    MinLength: '1'
+    Type: String
+  OperatingSystem:
+    AllowedValues:
+    - Linux
+    - Windows
+    ConstraintDescription: Must be Windows or Linux.
+    Default: Linux
+    Description: Amazon EC2 operating system type (Linux or Windows).
+    Type: String
+  SSHLocation:
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x.
+    Default: 0.0.0.0/0
+    Description: The IP address range that can be used to connect using SSH or RDP
+      to the Amazon EC2 instances.
+    MaxLength: '18'
+    MinLength: '9'
+    Type: String
+  TagKey:
+    AllowedPattern: '[\x20-\x7E]*'
+    ConstraintDescription: Can contain only ASCII characters.
+    Default: Name
+    Description: The EC2 tag key that identifies this as a target for deployments.
+    Type: String
+  TagValue:
+    AllowedPattern: '[\x20-\x7E]*'
+    ConstraintDescription: Can contain only ASCII characters.
+    Default: CodeDeployDemo
+    Description: The EC2 tag value that identifies this as a target for deployments.
+    Type: String
+Resources:
+  CodeDeployRolePolicies:
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Action:
+          - ec2:Describe*
+          Effect: Allow
+          Resource:
+          - '*'
+        - Action:
+          - autoscaling:CompleteLifecycleAction
+          - autoscaling:DeleteLifecycleHook
+          - autoscaling:DescribeLifecycleHooks
+          - autoscaling:DescribeAutoScalingGroups
+          - autoscaling:PutLifecycleHook
+          - autoscaling:RecordLifecycleActionHeartbeat
+          Effect: Allow
+          Resource:
+          - '*'
+      PolicyName: CodeDeployPolicy
+      Roles:
+      - Ref: CodeDeployTrustRole
+    Type: AWS::IAM::Policy
+  CodeDeployTrustRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - codedeploy.us-east-1.amazonaws.com
+            - codedeploy.us-west-2.amazonaws.com
+          Sid: '1'
+      Path: /
+    Type: AWS::IAM::Role
+  InstanceRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+      Path: /
+    Type: AWS::IAM::Role
+  InstanceRoleInstanceProfile:
+    Properties:
+      Path: /
+      Roles:
+      - Ref: InstanceRole
+    Type: AWS::IAM::InstanceProfile
+  InstanceRolePolicies:
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Action:
+          - autoscaling:Describe*
+          - cloudformation:Describe*
+          - cloudformation:GetTemplate
+          - s3:Get*
+          Effect: Allow
+          Resource: '*'
+      PolicyName: InstanceRole
+      Roles:
+      - Ref: InstanceRole
+    Type: AWS::IAM::Policy
+  LinuxEC2Instance:
+    Condition: LaunchLinuxEC2Instance1
+    Metadata:
+      AWS::CloudFormation::Init:
+        services:
+          sysvint:
+            codedeploy-agent:
+              enabled: 'true'
+              ensureRunning: 'true'
+    Properties:
+      IamInstanceProfile:
+        Ref: InstanceRoleInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+        - RegionOS2AMI
+        - Ref: AWS::Region
+        - Ref: OperatingSystem
+      InstanceType:
+        Ref: InstanceType
+      KeyName:
+        Ref: KeyPairName
+      SecurityGroups:
+      - Ref: SecurityGroup
+      Tags:
+      - Key:
+          Ref: TagKey
+        Value:
+          Ref: TagValue
+      - Key: CostCenter
+        Value: regalosydetallesdiamante
+      - Key: Stack
+        Value: test
+      - Key: App
+        Value: RegalosYDetallesDiamante
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+          - ''
+          - - '#!/bin/bash -ex
+
+              '
+            - 'yum update -y aws-cfn-bootstrap
+
+              '
+            - 'yum install -y aws-cli
+
+              '
+            - '# Helper function.
+
+              '
+            - 'function error_exit
+
+              '
+            - '{
+
+              '
+            - '  /opt/aws/bin/cfn-signal -e 1 -r "$1" '''
+            - Ref: WaitHandle
+            - '''
+
+              '
+            - '  exit 1
+
+              '
+            - '}
+
+              '
+            - '# Install the AWS CodeDeploy Agent.
+
+              '
+            - 'cd /home/ec2-user/
+
+              '
+            - 'aws s3 cp ''s3://aws-codedeploy-us-east-1/latest/codedeploy-agent.noarch.rpm''
+              . || error_exit ''Failed to download AWS CodeDeploy Agent.''
+
+              '
+            - "yum -y install codedeploy-agent.noarch.rpm || error_exit 'Failed to\
+              \ install AWS CodeDeploy Agent.' \n"
+            - '/opt/aws/bin/cfn-init -s '
+            - Ref: AWS::StackId
+            - ' -r LinuxEC2Instance --region '
+            - Ref: AWS::Region
+            - ' || error_exit ''Failed to run cfn-init.''
+
+              '
+            - '# All is well, so signal success.
+
+              '
+            - /opt/aws/bin/cfn-signal -e 0 -r "AWS CodeDeploy Agent setup complete."
+              '
+            - Ref: WaitHandle
+            - '''
+
+              '
+    Type: AWS::EC2::Instance
+  LinuxEC2Instance2:
+    Condition: LaunchLinuxEC2Instance2
+    Metadata:
+      AWS::CloudFormation::Init:
+        services:
+          sysvint:
+            codedeploy-agent:
+              enabled: 'true'
+              ensureRunning: 'true'
+    Properties:
+      IamInstanceProfile:
+        Ref: InstanceRoleInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+        - RegionOS2AMI
+        - Ref: AWS::Region
+        - Ref: OperatingSystem
+      InstanceType:
+        Ref: InstanceType
+      KeyName:
+        Ref: KeyPairName
+      SecurityGroups:
+      - Ref: SecurityGroup
+      Tags:
+      - Key:
+          Ref: TagKey
+        Value:
+          Ref: TagValue
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+          - ''
+          - - '#!/bin/bash -ex
+
+              '
+            - 'yum update -y aws-cfn-bootstrap
+
+              '
+            - 'yum install -y aws-cli
+
+              '
+            - '# Helper function.
+
+              '
+            - 'function error_exit
+
+              '
+            - '{
+
+              '
+            - '  /opt/aws/bin/cfn-signal -e 1 -r "$1" '''
+            - Ref: WaitHandle
+            - '''
+
+              '
+            - '  exit 1
+
+              '
+            - '}
+
+              '
+            - '# Install the AWS CodeDeploy Agent.
+
+              '
+            - 'cd /home/ec2-user/
+
+              '
+            - 'aws s3 cp ''s3://aws-codedeploy-us-east-1/latest/codedeploy-agent.noarch.rpm''
+              . || error_exit ''Failed to download AWS CodeDeploy Agent.''
+
+              '
+            - "yum -y install codedeploy-agent.noarch.rpm || error_exit 'Failed to\
+              \ install AWS CodeDeploy Agent.' \n"
+            - '/opt/aws/bin/cfn-init -s '
+            - Ref: AWS::StackId
+            - ' -r LinuxEC2Instance --region '
+            - Ref: AWS::Region
+            - ' || error_exit ''Failed to run cfn-init.''
+
+              '
+            - '# All is well, so signal success.
+
+              '
+            - /opt/aws/bin/cfn-signal -e 0 -r "AWS CodeDeploy Agent setup complete."
+              '
+            - Ref: WaitHandle
+            - '''
+
+              '
+    Type: AWS::EC2::Instance
+  LinuxEC2Instance3:
+    Condition: LaunchLinuxEC2Instance3
+    Metadata:
+      AWS::CloudFormation::Init:
+        services:
+          sysvint:
+            codedeploy-agent:
+              enabled: 'true'
+              ensureRunning: 'true'
+    Properties:
+      IamInstanceProfile:
+        Ref: InstanceRoleInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+        - RegionOS2AMI
+        - Ref: AWS::Region
+        - Ref: OperatingSystem
+      InstanceType:
+        Ref: InstanceType
+      KeyName:
+        Ref: KeyPairName
+      SecurityGroups:
+      - Ref: SecurityGroup
+      Tags:
+      - Key:
+          Ref: TagKey
+        Value:
+          Ref: TagValue
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+          - ''
+          - - '#!/bin/bash -ex
+
+              '
+            - 'yum update -y aws-cfn-bootstrap
+
+              '
+            - 'yum install -y aws-cli
+
+              '
+            - '# Helper function.
+
+              '
+            - 'function error_exit
+
+              '
+            - '{
+
+              '
+            - '  /opt/aws/bin/cfn-signal -e 1 -r "$1" '''
+            - Ref: WaitHandle
+            - '''
+
+              '
+            - '  exit 1
+
+              '
+            - '}
+
+              '
+            - '# Install the AWS CodeDeploy Agent.
+
+              '
+            - 'cd /home/ec2-user/
+
+              '
+            - 'aws s3 cp ''s3://aws-codedeploy-us-east-1/latest/codedeploy-agent.noarch.rpm''
+              . || error_exit ''Failed to download AWS CodeDeploy Agent.''
+
+              '
+            - "yum -y install codedeploy-agent.noarch.rpm || error_exit 'Failed to\
+              \ install AWS CodeDeploy Agent.' \n"
+            - '/opt/aws/bin/cfn-init -s '
+            - Ref: AWS::StackId
+            - ' -r LinuxEC2Instance --region '
+            - Ref: AWS::Region
+            - ' || error_exit ''Failed to run cfn-init.''
+
+              '
+            - '# All is well, so signal success.
+
+              '
+            - /opt/aws/bin/cfn-signal -e 0 -r "AWS CodeDeploy Agent setup complete."
+              '
+            - Ref: WaitHandle
+            - '''
+
+              '
+    Type: AWS::EC2::Instance
+  SecurityGroup:
+    Properties:
+      GroupDescription: Enable HTTP access via port 80 and SSH access.
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        FromPort: '80'
+        IpProtocol: tcp
+        ToPort: '80'
+      - CidrIp:
+          Ref: SSHLocation
+        FromPort:
+          Fn::FindInMap:
+          - OS2SSHPort
+          - Ref: OperatingSystem
+          - SSHPort
+        IpProtocol: tcp
+        ToPort:
+          Fn::FindInMap:
+          - OS2SSHPort
+          - Ref: OperatingSystem
+          - SSHPort
+    Type: AWS::EC2::SecurityGroup
+  WaitCondition:
+    Properties:
+      Count:
+        Ref: InstanceCount
+      Handle:
+        Ref: WaitHandle
+      Timeout: '900'
+    Type: AWS::CloudFormation::WaitCondition
+  WaitHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+  WindowsEC2Instance:
+    Condition: LaunchWindowsEC2Instance1
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          commands:
+            00-download-host-agent:
+              command:
+                Fn::Join:
+                - ''
+                - - 'powershell.exe -Command "Read-S3Object '
+                  - '-BucketName aws-codedeploy-us-east-1 '
+                  - '-Key latest/codedeploy-agent.msi '
+                  - -File codedeploy-agent.msi"
+              cwd: C:/cfn
+              waitAfterCompletion: 0
+            01-install-host-agent:
+              command: C:\cfn\codedeploy-agent.msi /quiet /l C:\cfn\host-agent-install-log.txt
+              ignoreErrors: 'true'
+              waitAfterCompletion: 0
+            02-signal-ready:
+              command:
+                Fn::Join:
+                - ''
+                - - '"C:\Program Files\Amazon\cfn-bootstrap\cfn-signal"'
+                  - ' -e 0 "'
+                  - Ref: WaitHandle
+                  - '"'
+              waitAfterCompletion: 0
+          services:
+            windows:
+              codedeploy-agent:
+                commands:
+                - 01-install-host-agent
+                enabled: 'true'
+                ensureRunning: 'true'
+    Properties:
+      IamInstanceProfile:
+        Ref: InstanceRoleInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+        - RegionOS2AMI
+        - Ref: AWS::Region
+        - Ref: OperatingSystem
+      InstanceType:
+        Ref: InstanceType
+      KeyName:
+        Ref: KeyPairName
+      SecurityGroups:
+      - Ref: SecurityGroup
+      Tags:
+      - Key:
+          Ref: TagKey
+        Value:
+          Ref: TagValue
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+          - ''
+          - - '<script>
+
+              '
+            - 'mkdir c:\cfn
+
+              '
+            - 'mkdir c:\cfn\log
+
+              '
+            - 'c:\"Program Files"\Amazon\cfn-bootstrap\cfn-init.exe -s '
+            - Ref: AWS::StackName
+            - ' --region '
+            - Ref: AWS::Region
+            - ' -r WindowsEC2Instance > c:\cfn\log\cfn-call-log 2>&1'
+            - </script>
+    Type: AWS::EC2::Instance
+  WindowsEC2Instance2:
+    Condition: LaunchWindowsEC2Instance2
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          commands:
+            00-download-host-agent:
+              command:
+                Fn::Join:
+                - ''
+                - - 'powershell.exe -Command "Read-S3Object '
+                  - '-BucketName aws-codedeploy-us-east-1 '
+                  - '-Key latest/codedeploy-agent.msi '
+                  - -File codedeploy-agent.msi"
+              cwd: C:/cfn
+              waitAfterCompletion: 0
+            01-install-host-agent:
+              command: C:\cfn\codedeploy-agent.msi /quiet /l C:\cfn\host-agent-install-log.txt
+              ignoreErrors: 'true'
+              waitAfterCompletion: 0
+            02-signal-ready:
+              command:
+                Fn::Join:
+                - ''
+                - - '"C:\Program Files\Amazon\cfn-bootstrap\cfn-signal"'
+                  - ' -e 0 "'
+                  - Ref: WaitHandle
+                  - '"'
+              waitAfterCompletion: 0
+          services:
+            windows:
+              codedeploy-agent:
+                commands:
+                - 01-install-host-agent
+                enabled: 'true'
+                ensureRunning: 'true'
+    Properties:
+      IamInstanceProfile:
+        Ref: InstanceRoleInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+        - RegionOS2AMI
+        - Ref: AWS::Region
+        - Ref: OperatingSystem
+      InstanceType:
+        Ref: InstanceType
+      KeyName:
+        Ref: KeyPairName
+      SecurityGroups:
+      - Ref: SecurityGroup
+      Tags:
+      - Key:
+          Ref: TagKey
+        Value:
+          Ref: TagValue
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+          - ''
+          - - '<script>
+
+              '
+            - 'mkdir c:\cfn
+
+              '
+            - 'mkdir c:\cfn\log
+
+              '
+            - 'c:\"Program Files"\Amazon\cfn-bootstrap\cfn-init.exe -s '
+            - Ref: AWS::StackName
+            - ' --region '
+            - Ref: AWS::Region
+            - ' -r WindowsEC2Instance > c:\cfn\log\cfn-call-log 2>&1'
+            - </script>
+    Type: AWS::EC2::Instance
+  WindowsEC2Instance3:
+    Condition: LaunchWindowsEC2Instance3
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          commands:
+            00-download-host-agent:
+              command:
+                Fn::Join:
+                - ''
+                - - 'powershell.exe -Command "Read-S3Object '
+                  - '-BucketName aws-codedeploy-us-east-1 '
+                  - '-Key latest/codedeploy-agent.msi '
+                  - -File codedeploy-agent.msi"
+              cwd: C:/cfn
+              waitAfterCompletion: 0
+            01-install-host-agent:
+              command: C:\cfn\codedeploy-agent.msi /quiet /l C:\cfn\host-agent-install-log.txt
+              ignoreErrors: 'true'
+              waitAfterCompletion: 0
+            02-signal-ready:
+              command:
+                Fn::Join:
+                - ''
+                - - '"C:\Program Files\Amazon\cfn-bootstrap\cfn-signal"'
+                  - ' -e 0 "'
+                  - Ref: WaitHandle
+                  - '"'
+              waitAfterCompletion: 0
+          services:
+            windows:
+              codedeploy-agent:
+                commands:
+                - 01-install-host-agent
+                enabled: 'true'
+                ensureRunning: 'true'
+    Properties:
+      IamInstanceProfile:
+        Ref: InstanceRoleInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+        - RegionOS2AMI
+        - Ref: AWS::Region
+        - Ref: OperatingSystem
+      InstanceType:
+        Ref: InstanceType
+      KeyName:
+        Ref: KeyPairName
+      SecurityGroups:
+      - Ref: SecurityGroup
+      Tags:
+      - Key:
+          Ref: TagKey
+        Value:
+          Ref: TagValue
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+          - ''
+          - - '<script>
+
+              '
+            - 'mkdir c:\cfn
+
+              '
+            - 'mkdir c:\cfn\log
+
+              '
+            - 'c:\"Program Files"\Amazon\cfn-bootstrap\cfn-init.exe -s '
+            - Ref: AWS::StackName
+            - ' --region '
+            - Ref: AWS::Region
+            - ' -r WindowsEC2Instance > c:\cfn\log\cfn-call-log 2>&1'
+            - </script>
+    Type: AWS::EC2::Instance

@@ -2,17 +2,20 @@ version: '2'
 services:
   webserver:
     hostname: woocommerce
-    image: shipbeat/woocommerce
-    environment:
-      WORDPRESS_DB_PASSWORD: example
     links:
       - dbserver:mysql
+    build:
+      context: .
+      dockerfile: WordPressWoocommerce.yml
     ports:
       - 8080:80
     mem_limit: 521666560
     cpu_shares: 100
     volumes:
-      - ./wordpress:/var/www/html
+    - ./WordPress/:/var/www/html/
+    environment:
+      WORDPRESS_DB_HOST: dbserver
+      WORDPRESS_DB_PASSWORD: example
 
   dbserver:
     hostname: woomariadb
