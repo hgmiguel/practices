@@ -1,7 +1,0 @@
-myInstance:
-  Type: AWS::EC2::Instance
-  Properties:
-    ImageId: !FindInMap [ AWSRegionToAMI , !Ref 'AWS::Region', 64 ]
-    SecurityGroupIds:
-    - !GetAtt myVPC.DefaultSecurityGroup
-    SubnetId: !Ref mySubnet
