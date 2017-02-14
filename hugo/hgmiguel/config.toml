@@ -1,0 +1,41 @@
+## basic config
+languageCode = "en-us"
+title = "hgmiguel.MX"
+baseURL = "http://hgmiguel.mx/"
+theme = "hugo-goa"
+
+contentdir = "content"
+layoutdir = "layouts"
+publishdir = "public"
+
+author = "Miguel Angel Huerta"
+
+[params]
+author = "Miguel Angel Huerta"
+intro = "Desarrollador de software"
+description = "Especializado en temas devops y desarrollo con java."
+authorimage = "perfil.jpg"
+dateformat = "Jan 2, 2006"
+
+[params.social]
+github = "hgmiguel"
+linkedin = "hgmiguel"
+twitter = "hgmiguel"
+facebook = "hgmiguel"
+#google = "100718508856228319369"
+#stackoverflow = "430204/hgmiguel"
+email = "hgmiguel@gmail.com"
+
+## Extras
+[params.extra]
+copyright = "© 2017. Miguel Angel Huerta. [Some Rights Reserved](http://creativecommons.org/licenses/by/3.0/)." 
+poweredby = false
+hightlightjs = true
+
+
+## Main Menu
+[[menu.main]]
+    name = "about"
+    identifier = "about"
+    weight = 200
+    url = "/about/"
