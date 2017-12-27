@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: testing
+    Description: environment
+  CidrBlock:
+    Type: String
+    Default: 10.0.0.0/16 # We only need 1 IPaddress for our OpenVPN server, I just like even numbers and 8-bit subnets
+  CostCenter:
+    Type: String
+    Default: hgmigue-labs
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref CidrBlock
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::Region}:${AWS::AccountId}:${Environment}'
+      - Key: CostCenter
+        Value: !Ref CostCenter
+
+Outputs:
+  VPC:
+    Description: 'VPC'
+    Value: !Ref VPC
+    Export:
+      Name: !Sub 'VPC:${Environment}'
+
+

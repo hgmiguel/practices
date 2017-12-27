@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  WebServerRoleInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !ImportValue cloudwatch-Role
+  WebServerInstance:
+    Type: AWS::EC2::Instance
+    Metadata: 
+      AWS::CloudFormation::Init:
+        configSets:
+          WebServer:
+            - WebServer
+        WebServer:
+          packages:
+            yum:
+              httpd: []
+    Properties: 
+      InstanceType: t2.nano
+      ImageId: ami-8c1be5f6
+      KeyName: public-globant-hgmiguel-key
+      SubnetId: subnet-09fb6251
+      IamInstanceProfile: 
+        Ref: WebServerRoleInstanceProfile
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          yum update -y
+          yum install -y aws-cfn-bootstrap
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerInstance --configsets WebServer --region ${AWS::Region}
+          /opt/aws/bin/cfn-init -v --stack cloudwatch --resource EC2InstanceToWatch --configsets CloudWatch --region ${AWS::Region}
+

@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  CloudWatchRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: CloudWatchRole
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ec2.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/CloudWatchFullAccess'
+  CloudWatchRoleInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - Ref: CloudWatchRole
+  EC2InstanceToWatch:
+    Type: AWS::EC2::Instance
+    Metadata: 
+      AWS::CloudFormation::Init:
+        configSets:
+          CloudWatch:
+            - CloudWatch
+        CloudWatch:
+          packages:
+            yum:
+              perl-Switch: []
+              perl-DateTime: []
+              perl-Sys-Syslog: []
+              perl-LWP-Protocol-https: []
+          commands:
+            1_download_cloudwatch_scripts:
+              command: "curl http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip -O"
+              cwd: "/opt/"
+              test: "test ! -e /opt/CloudWatchMonitoringScripts-1.2.1.zip"
+            2_unzip_cloudwatch_scripts:
+              command: "unzip /opt/CloudWatchMonitoringScripts-1.2.1.zip"
+              cwd: "/opt/"
+              test: "test ! -d /opt/aws-scripts-mon"
+            3_remove_cloudwatch_scripts:
+              command: "rm CloudWatchMonitoringScripts-1.2.1.zip"
+              cwd: "/opt/"
+            4_remove_cloudwatch_crontabfile:
+              command: "rm /etc/cron.d/cloudwatch_monitoring.bak"
+              ignoreErrors: true
+          files:
+            /etc/cron.d/cloudwatch_monitoring:
+              content: !Sub | 
+                #cloudwatch monitor
+                */5 * * * * root /opt/aws-scripts-mon/mon-put-instance-data.pl --mem-util --mem-used-incl-cache-buff --mem-used --mem-avail --from-cron &>> /var/log/cloudwatch_monitoring.log
+
+              mode: "000644"
+              owner: "root"
+              group: "root"
+                
+    Properties: 
+      InstanceType: t2.nano
+      ImageId: ami-8c1be5f6
+      KeyName: public-globant-hgmiguel-key
+      SubnetId: subnet-09fb6251
+      IamInstanceProfile: 
+        Ref: CloudWatchRoleInstanceProfile
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          yum update -y
+          yum install -y aws-cfn-bootstrap
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource EC2InstanceToWatch --configsets CloudWatch --region ${AWS::Region}
+Outputs:
+  CloudWatchRole:
+    Description: Role for access to cloudwatch
+    Value: !Ref CloudWatchRole
+    Export: 
+      Name: !Sub "${AWS::StackName}-Role"
+
+  
