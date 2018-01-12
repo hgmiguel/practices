@@ -17,11 +17,25 @@ Resources:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: !Ref CidrBlock
+      EnableDnsHostnames: true
       Tags:
       - Key: Name
-        Value: !Sub '${AWS::Region}:${AWS::AccountId}:${Environment}'
+        Value: !Sub '${AWS::Region}:${AWS::AccountId}:${Environment}:Vpc'
       - Key: CostCenter
         Value: !Ref CostCenter
+  InternetGateway:
+    Type: "AWS::EC2::InternetGateway"
+    Properties:
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::Region}:${AWS::AccountId}:${Environment}:InternetGateway'
+      - Key: CostCenter
+        Value: !Ref CostCenter
+  AttachGateway:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties: 
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
 
 Outputs:
   VPC:
@@ -29,5 +43,10 @@ Outputs:
     Value: !Ref VPC
     Export:
       Name: !Sub '${Environment}:VPC'
+  InternetGateway:
+    Description: 'Internet Gateway'
+    Value: !Ref InternetGateway
+    Export:
+      Name: !Sub '${Environment}:InternetGateway'
 
 
