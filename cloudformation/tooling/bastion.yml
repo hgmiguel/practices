@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: 2010-09-09
+Mappings: 
+  RegionMap: 
+    us-east-1: 
+      testing: "ami-4dd18837"
+      staging: "ami-4dd18837"
+Parameters:
+  Environment:
+    Type: String
+    Default: testing
+    Description: environment
+  CostCenter:
+    Type: String
+    Default: hgmigue-labs
+  InstanceType:
+    Type: String
+    Default: t2.micro
+  SSHKeyName:
+    Type: String
+    Default: public-globant-hgmiguel-key
+
+Resources:
+  Bastion:
+    Type: AWS::EC2::Instance
+    Properties: 
+      InstanceType: !Ref InstanceType
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", !Ref Environment]
+      KeyName: !Ref SSHKeyName
+      SubnetId:
+        Fn::ImportValue:
+          !Sub "${Environment}:PublicSubnetTooling"
+      SecurityGroupIds:
+        - Fn::ImportValue:
+            !Sub "${Environment}:BastionSecurityGroup"
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::Region}:${AWS::AccountId}:${Environment}:Bastion'
+      - Key: CostCenter
+        Value: !Ref CostCenter
+Outputs:
+  Bastion:
+    Description: Bastion host for admin
+    Value: !GetAtt Bastion.PublicDnsName
+    Export: 
+      Name: !Sub "${Environment}:Bastion"
+
+  

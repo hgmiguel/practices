@@ -50,3 +50,21 @@ aws \
   --stack-name "networking-$ENVIRONMENT" \
   --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM \
   --parameter-override $CF_PARAMETERS
+
+aws \
+  --profile hgmiguel \
+  --region us-east-1 \
+  cloudformation deploy \
+  --template-file infrastructure/security-groups.yml \
+  --stack-name "security-groups-$ENVIRONMENT" \
+  --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM \
+  --parameter-override $CF_PARAMETERS
+
+aws \
+  --profile hgmiguel \
+  --region us-east-1 \
+  cloudformation deploy \
+  --template-file tooling/bastion.yml \
+  --stack-name "bastion-$ENVIRONMENT" \
+  --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM \
+  --parameter-override $CF_PARAMETERS

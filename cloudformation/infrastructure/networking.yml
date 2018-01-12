@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: testing
+    Description: environment
+  CidrBlockTooling:
+    Type: String
+    Default: 10.0.1.0/24
+  CidrBlockToolingPublic:
+    Type: String
+    Default: 10.0.2.0/24
+  CostCenter:
+    Type: String
+    Default: hgmigue-labs
+
+Resources:
+  PrivateSubnetTooling:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Ref CidrBlockTooling
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::Region}:${AWS::AccountId}:${Environment}'
+      - Key: CostCenter
+        Value: !Ref CostCenter
+      VpcId: 
+        Fn::ImportValue:
+          !Sub "${Environment}:VPC"
+  PublicSubnetTooling:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Ref CidrBlockToolingPublic
+      MapPublicIpOnLaunch: true
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::Region}:${AWS::AccountId}:${Environment}:PublicSubnetTooling'
+      - Key: CostCenter
+        Value: !Ref CostCenter
+      VpcId: 
+        Fn::ImportValue:
+          !Sub "${Environment}:VPC"
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: 
+        Fn::ImportValue:
+          !Sub "${Environment}:VPC"
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::Region}:${AWS::AccountId}:${Environment}:PublicRouteTable'
+      - Key: CostCenter
+        Value: !Ref CostCenter
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: 
+        Fn::ImportValue:
+          !Sub "${Environment}:InternetGateway"
+  PublicSubnetRouteTableAssociationPublicSubnetTooling:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnetTooling
+      RouteTableId: !Ref PublicRouteTable
+Outputs:
+  PrivateSubnetTooling:
+    Description: 'Private subnet for tooling proyects'
+    Value: !Ref PrivateSubnetTooling
+    Export:
+      Name: !Sub '${Environment}:PrivateSubnetTooling'
+  PublicSubnetTooling:
+    Description: 'Public subnet for tooling proyects'
+    Value: !Ref PublicSubnetTooling
+    Export:
+      Name: !Sub '${Environment}:PublicSubnetTooling'
+
+
+
