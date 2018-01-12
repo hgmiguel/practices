@@ -42,3 +42,11 @@ aws \
   --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM \
   --parameter-override $CF_PARAMETERS
 
+aws \
+  --profile hgmiguel \
+  --region us-east-1 \
+  cloudformation deploy \
+  --template-file infrastructure/networking.yml \
+  --stack-name "networking-$ENVIRONMENT" \
+  --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM \
+  --parameter-override $CF_PARAMETERS

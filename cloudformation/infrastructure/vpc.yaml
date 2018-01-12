@@ -28,6 +28,6 @@ Outputs:
     Description: 'VPC'
     Value: !Ref VPC
     Export:
-      Name: !Sub 'VPC:${Environment}'
+      Name: !Sub '${Environment}:VPC'
 
 
