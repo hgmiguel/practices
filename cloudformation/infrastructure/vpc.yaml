@@ -7,7 +7,7 @@ Parameters:
     Description: environment
   CidrBlock:
     Type: String
-    Default: 10.0.0.0/16 # We only need 1 IPaddress for our OpenVPN server, I just like even numbers and 8-bit subnets
+    Default: 10.0.0.0/16 
   CostCenter:
     Type: String
     Default: hgmigue-labs
