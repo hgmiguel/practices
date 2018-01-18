@@ -7,15 +7,15 @@ Parameters:
   CostCenter:
     Type: String
     Default: hgmigue-labs
+  Vpc:
+    Type: String
 
 Resources:
   BastionSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow ssh to client host
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${Environment}:VPC"
+      VpcId: !Ref Vpc
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: '22'

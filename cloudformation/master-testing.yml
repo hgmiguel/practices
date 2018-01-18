@@ -31,10 +31,13 @@ Resources:
         Environment: !Ref Environment
         CidrBlockTooling: 10.0.1.0/24 
         CidrBlockToolingPublic: 10.0.2.0/24
+        Vpc: !GetAtt VPC.Outputs.VPC
+        InternetGateway: !GetAtt VPC.Outputs.InternetGateway
   SecurityGroups:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: ./infrastructure/security-groups.yml
       Parameters:
         Environment: !Ref Environment
+        Vpc: !GetAtt VPC.Outputs.VPC
 

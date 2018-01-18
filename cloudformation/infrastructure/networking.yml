@@ -14,6 +14,10 @@ Parameters:
   CostCenter:
     Type: String
     Default: hgmigue-labs
+  Vpc:
+    Type: String
+  InternetGateway:
+    Type: String
 
 Resources:
   PrivateSubnetTooling:
@@ -25,9 +29,7 @@ Resources:
         Value: !Sub '${AWS::Region}:${AWS::AccountId}:${Environment}'
       - Key: CostCenter
         Value: !Ref CostCenter
-      VpcId: 
-        Fn::ImportValue:
-          !Sub "${Environment}:VPC"
+      VpcId: !Ref Vpc
   PublicSubnetTooling:
     Type: AWS::EC2::Subnet
     Properties:
@@ -38,15 +40,11 @@ Resources:
         Value: !Sub '${AWS::Region}:${AWS::AccountId}:${Environment}:PublicSubnetTooling'
       - Key: CostCenter
         Value: !Ref CostCenter
-      VpcId: 
-        Fn::ImportValue:
-          !Sub "${Environment}:VPC"
+      VpcId: !Ref Vpc
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: 
-        Fn::ImportValue:
-          !Sub "${Environment}:VPC"
+      VpcId: !Ref Vpc
       Tags:
       - Key: Name
         Value: !Sub '${AWS::Region}:${AWS::AccountId}:${Environment}:PublicRouteTable'
@@ -57,9 +55,7 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: 
-        Fn::ImportValue:
-          !Sub "${Environment}:InternetGateway"
+      GatewayId:  !Ref InternetGateway
   PublicSubnetRouteTableAssociationPublicSubnetTooling:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
