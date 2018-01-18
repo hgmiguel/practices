@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: testing
+    Description: environment
+  CidrBlock:
+    Type: String
+    Default: 10.0.0.0/16 
+  CostCenter:
+    Type: String
+    Default: hgmigue-labs
+
+Resources:
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./infrastructure/vpc.yml
+      Parameters:
+        Environment: !Ref Environment
+        CidrBlock: 10.0.0.0/16
+        #CostCenter: !Ref AWS::StackName
+    
+
+  Networking:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./infrastructure/networking.yml
+      Parameters:
+        Environment: !Ref Environment
+        CidrBlockTooling: 10.0.1.0/24 
+        CidrBlockToolingPublic: 10.0.2.0/24
+  SecurityGroups:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./infrastructure/security-groups.yml
+      Parameters:
+        Environment: !Ref Environment
+
