@@ -2,7 +2,7 @@
 languageCode = "en-us"
 title = "hgmiguel.MX"
 baseURL = "http://hgmiguel.mx/"
-theme = "hugo-goa"
+theme = "soho"
 
 contentdir = "content"
 layoutdir = "layouts"
@@ -10,54 +10,66 @@ publishdir = "public"
 
 author = "Miguel Angel Huerta González"
 
+enableInlineShortcodes = true
+
+summarylength = 10
+enableEmoji = true
+
 [markup]
+
   [markup.highlight]
-    codeFences = true
-    guessSyntax = false
-    hl_Lines = ""
-    lineNoStart = 1
-    lineNos = false
-    lineNumbersInTable = true
-    noClasses = true
-    style = "monokai"
-    tabWidth = 4
+  codeFences = true
+  guessSyntax = false
+  hl_Lines = ""
+  lineNoStart = 1
+  lineNos = false
+  lineNumbersInTable = true
+  noClasses = true # if false, you need to provide you own custom CSS
+  style = "monokai"
+  tabWidth = 4
 
 [params]
 author = "Miguel Angel Huerta González"
-intro = "DevOps practitioner"
-description = "AWS solutions architecht" 
+intro = "AWS solutions architecht" 
+description = "DevOps practitioner"
 authorimage = "perfil.jpg"
+profilePicture = "img/perfil.jpg"
 dateformat = "Jan 2, 2006"
+copyright = "Miguel Angel Huerta González"
+license = "CC BY-SA 4.0"
+licenseURL = "https://creativecommons.org/licenses/by-sa/4.0"
+  ## Set as many as you want.
+  [[params.socialIcons]]
+  icon = "fa-linkedin"
+  title = "Linkedin"
+  url = "hgmiguel"
 
-[params.social]
-github = "hgmiguel"
-linkedin = "hgmiguel"
-twitter = "hgmiguel"
-facebook = "hgmiguel"
-#google = "100718508856228319369"
-#stackoverflow = "430204/hgmiguel"
-email = "hgmiguel@gmail.com"
+  [[params.socialIcons]]
+  icon = "fa-github"
+  title = "GitHub"
+  url = "hgmiguel"
 
-## Extras
-[params.extra]
-copyright = "© 2020. Miguel Angel Huerta. [Some Rights Reserved](http://creativecommons.org/licenses/by/3.0/)." 
-poweredby = false
-hightlightjs = true
+  [[params.socialIcons]]
+  icon = "fa-twitter"
+  title = "Twitter"
+  url = "hgmiguel"
 
 
+
+[menu]
 ## Main Menu
 [[menu.main]]
-    name = "about"
+    name = "Blog"
+    weight = 100
+    identifier = "post"
+    url = "/post/"
+[[menu.main]]
+    name = "About"
     identifier = "about"
     weight = 200
     url = "/about/"
 [[menu.main]]
-    name = "blog"
-    weight = 100
-    identifier = "blog"
-    url = "/blog/"
-[[menu.main]]
-    name = "want to donate?"
+    name = "Want to donate?"
     identifier = "donate"
     weight = 300
     url = "/donate/"
