@@ -1,11 +1,23 @@
-# S3 lab
++++
+categories = ["aws", "cdk", "laboratory"]
+comments = true
+date = "2020-03-28T15:59:13-04:00"
+draft = true
+showpagemeta = false
+showcomments = true
+slug = ""
+tags = ["cdk", "aws", "ssm", "s3", "python"]
+title = "S3 bucket with hash postfix "
+description = "How to create an S3 bucket with cdk"
 
-La intención de este lab es crear un bucket S3 y añadirle al final un hash, este hash debe ser calculado al momento y una vez creado el s3 se debe de mantener.
++++
 
+The purpose of this laboratory is to create a S3 bucket with a random hash suffix, this hash need to be computed at the creation moment and for further updates it will be preserve.
 
+I tried to put the suffix with a simple hash, but immediately we can notice that the suffix change every time.
 
 Al intentar ponerle un sufijo al bucket obtenemos este en cada ejecución:
-```py
+{{< highlight python "hl_lines=5 7">}}
 class S3BucketStack(core.Stack):
     def __init__(self, scope: core.Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
@@ -16,8 +28,9 @@ class S3BucketStack(core.Stack):
         s3Bucket = s3.Bucket(self, 'Bucket', bucket_name=f'{bucket_name}-{hash}')
         core.Tag.add(s3Bucket, "key", "value")
 
-```
-```sh
+{{< / highlight >}}
+
+{{< highlight sh "hl_lines=7">}}
  (master **)$ cdk --profile hgmiguel.mx diff
 Stack cdk-labs
 Resources
@@ -25,12 +38,11 @@ Resources
  └─ [~] BucketName (requires replacement)
      ├─ [-] hgmiguel.mx.test
      └─ [+] hgmiguel.mx.test-1a04f6
-```
+{{< / highlight >}}
 
 En la siguiente ejecución el hash vuelve a cambiar
 
-```sh
-(.env) miguelhuerta@MacBook-Pro-9 ~/Personal/cdk-labs
+{{< highlight sh "hl_lines=7">}}
  (master **)$ cdk --profile hgmiguel.mx diff
 Stack cdk-labs
 Resources
@@ -38,9 +50,41 @@ Resources
  └─ [~] BucketName (requires replacement)
      ├─ [-] hgmiguel.mx.test
      └─ [+] hgmiguel.mx.test-ba38c8
-```
+{{< / highlight >}}
 
-Intenté hacer que funcionara solo con CDK, pero no me dejaba
+I tried to archive this only with CDK but I didn't make it. It was so difficult to create the parameter store at the beginning that I abandoned quickly.
+
+I had thought about integrate sdk with boto3, and that made it.
+
+{{< highlight python>}}
+    def get_hash(self, bucket_name):
+        client = boto3.client('ssm')
+        s3_hash_parameter = self.node.try_get_context("s3_hash_parameter")
+        try:
+            response = client.get_parameter(
+                Name=s3_hash_parameter,
+                WithDecryption=True
+            )
+
+            s3_hashes = json.loads(response['Parameter']['Value'])
+            if bucket_name in s3_hashes:
+                return s3_hashes[bucket_name]
+            else:
+                s3_hashes[bucket_name] = uuid.uuid4().hex[:6]
+        except  Exception as e:
+            print(e)
+            s3_hashes = {bucket_name: uuid.uuid4().hex[:6]}
+
+        response = client.put_parameter(
+            Name=s3_hash_parameter,
+            Value=json.dumps(s3_hashes),
+            Type='SecureString',
+            Overwrite=True,
+            Tier='Intelligent-Tiering'
+        )
+
+        return s3_hashes[bucket_name]
+{{< / highlight >}}
 
 Al aplicar la parte de synth vemos que nos crea el *parameter store* y nos guarda el hash 
 ```sh (master **)$ cdk --profile hgmiguel.mx synth

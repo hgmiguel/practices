@@ -8,12 +8,24 @@ contentdir = "content"
 layoutdir = "layouts"
 publishdir = "public"
 
-author = "Miguel Angel Huerta"
+author = "Miguel Angel Huerta González"
+
+[markup]
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = false
+    hl_Lines = ""
+    lineNoStart = 1
+    lineNos = false
+    lineNumbersInTable = true
+    noClasses = true
+    style = "monokai"
+    tabWidth = 4
 
 [params]
-author = "Miguel Angel Huerta"
-intro = "Desarrollador de software"
-description = "Especializado en temas devops y desarrollo con java."
+author = "Miguel Angel Huerta González"
+intro = "DevOps practitioner"
+description = "AWS solutions architecht" 
 authorimage = "perfil.jpg"
 dateformat = "Jan 2, 2006"
 
@@ -28,7 +40,7 @@ email = "hgmiguel@gmail.com"
 
 ## Extras
 [params.extra]
-copyright = "© 2017. Miguel Angel Huerta. [Some Rights Reserved](http://creativecommons.org/licenses/by/3.0/)." 
+copyright = "© 2020. Miguel Angel Huerta. [Some Rights Reserved](http://creativecommons.org/licenses/by/3.0/)." 
 poweredby = false
 hightlightjs = true
 
@@ -39,3 +51,13 @@ hightlightjs = true
     identifier = "about"
     weight = 200
     url = "/about/"
+[[menu.main]]
+    name = "blog"
+    weight = 100
+    identifier = "blog"
+    url = "/blog/"
+[[menu.main]]
+    name = "want to donate?"
+    identifier = "donate"
+    weight = 300
+    url = "/donate/"
