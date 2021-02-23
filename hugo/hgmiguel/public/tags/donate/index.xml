@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>donate on hgmiguel.MX</title>
+    <link>http://hgmiguel.mx/tags/donate/</link>
+    <description>Recent content in donate on hgmiguel.MX</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 13 Feb 2017 19:41:11 -0600</lastBuildDate>
+    
+	<atom:link href="http://hgmiguel.mx/tags/donate/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Want to donate?</title>
+      <link>http://hgmiguel.mx/donate/</link>
+      <pubDate>Mon, 13 Feb 2017 19:41:11 -0600</pubDate>
+      
+      <guid>http://hgmiguel.mx/donate/</guid>
+      <description>Did you like this site? you can contribute donating here:</description>
+    </item>
+    
+  </channel>
+</rss>

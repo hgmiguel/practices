@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>cdk on hgmiguel.MX</title>
+    <link>http://hgmiguel.mx/categories/cdk/</link>
+    <description>Recent content in cdk on hgmiguel.MX</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 28 Mar 2020 15:59:13 -0400</lastBuildDate>
+    
+	<atom:link href="http://hgmiguel.mx/categories/cdk/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>S3 bucket with hash postfix </title>
+      <link>http://hgmiguel.mx/post/s3_lab/</link>
+      <pubDate>Sat, 28 Mar 2020 15:59:13 -0400</pubDate>
+      
+      <guid>http://hgmiguel.mx/post/s3_lab/</guid>
+      <description>Reference:
+ github repository: https://github.com/hgmiguel/cdk_labs/releases/tag/v1.0 ckd version: 1.31.0 (build 8f3ac79)  The purpose of this laboratory is to create a S3 bucket with a random hash suffix, this hash need to be computed at the creation moment and for further updates it will be preserve.</description>
+    </item>
+    
+  </channel>
+</rss>

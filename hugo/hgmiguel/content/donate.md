@@ -6,14 +6,15 @@ title = "Want to donate?"
 description = "How to create an S3 bucket with cdk"
 
 +++
-
-Did you like this site? you can contribute donating by this
-
-Bitcoin
+Did you like this site? you can contribute donating here:
 
 
-Referal links
+| | |
+| ----|:-------------|
+| BTC | bc1q5v3306ncykczxqfjstvmt3d80y8q05jf6a8ma5 |
+| ADA | DdzFFzCqrht4SdoSVz2soG26WGdp4gDaZNfhEAwDnPJaRFDk396CWthtmPTeFquKJAe1fSZ1j2vPkDqEpyLdG4MGXSUeqMVBVbhMYJgJ |
 
 
-En construcción
+You can support this site by using these Referal-Links.  It doesn't cost you anything!
 
+* <a href="https://lbry.tv/$/invite/@hgmiguel" target="_blank">LBRY</a> 

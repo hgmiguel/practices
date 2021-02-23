@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on hgmiguel.MX</title>
+    <link>http://hgmiguel.mx/categories/</link>
+    <description>Recent content in Categories on hgmiguel.MX</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 28 Mar 2020 15:59:13 -0400</lastBuildDate>
+    
+	<atom:link href="http://hgmiguel.mx/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>aws</title>
+      <link>http://hgmiguel.mx/categories/aws/</link>
+      <pubDate>Sat, 28 Mar 2020 15:59:13 -0400</pubDate>
+      
+      <guid>http://hgmiguel.mx/categories/aws/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>cdk</title>
+      <link>http://hgmiguel.mx/categories/cdk/</link>
+      <pubDate>Sat, 28 Mar 2020 15:59:13 -0400</pubDate>
+      
+      <guid>http://hgmiguel.mx/categories/cdk/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>laboratory</title>
+      <link>http://hgmiguel.mx/categories/laboratory/</link>
+      <pubDate>Sat, 28 Mar 2020 15:59:13 -0400</pubDate>
+      
+      <guid>http://hgmiguel.mx/categories/laboratory/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

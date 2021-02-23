@@ -20,3 +20,7 @@ In this project you get:
           +- test
           |   |
           |   +- java
+
+
+TEST
+TEST

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="Hugo 0.59.1" />
+
+  <title>S3 bucket with hash postfix  &middot; hgmiguel.MX</title>
+
+  <meta name="description" content="How to create an S3 bucket with cdk" />
+
+  
+  <meta property="og:locale" content="en-us"/>
+
+  
+  <meta property="og:image" content="http://hgmiguel.mx/img/perfil.jpg">
+
+  
+  <meta property="og:site_name" content="hgmiguel.MX"/>
+  <meta property="og:title" content="S3 bucket with hash postfix "/>
+  <meta property="og:description" content="How to create an S3 bucket with cdk"/>
+  <meta property="og:url" content="http://hgmiguel.mx/post/s3_lab/"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2020-03-28T15:59:13-0400"/>
+  <meta property="article:modified_time" content="2020-03-28T15:59:13-0400"/>
+  <meta property="article:author" content="Miguel Angel Huerta González">
+  
+  
+  
+
+  <script type="application/ld+json">
+  {
+    "@context" : "http://schema.org",
+    "@type" : "Blog",
+    "name": "hgmiguel.MX",
+    "url" : "http://hgmiguel.mx/",
+    "image": "http://hgmiguel.mx/img/perfil.jpg",
+    "description": "DevOps practitioner"
+  }
+  </script>
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "name": "S3 bucket with hash postfix ",
+    "headline": "S3 bucket with hash postfix ",
+    "datePublished": "2020-03-28T15:59:13-0400",
+    "dateModified": "2020-03-28T15:59:13-0400",
+    "author": {
+      "@type": "Person",
+      "name": "Miguel Angel Huerta González",
+      "url": "http://hgmiguel.mx/"
+    },
+    "image": "http://hgmiguel.mx/img/perfil.jpg",
+    "url": "http://hgmiguel.mx/post/s3_lab/",
+    "description": "How to create an S3 bucket with cdk"
+  }
+  </script>
+  
+
+
+  <link type="text/css"
+        rel="stylesheet"
+        href="http://hgmiguel.mx/css/print.css"
+        media="print">
+
+  <link type="text/css"
+        rel="stylesheet"
+        href="http://hgmiguel.mx/css/poole.css">
+
+  <link type="text/css"
+        rel="stylesheet"
+        href="http://hgmiguel.mx/css/hyde.css">
+
+  
+
+
+  
+
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700&display=swap">
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
+        integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
+        crossorigin="anonymous" />
+
+  <link rel="apple-touch-icon-precomposed"
+        sizes="144x144"
+        href="/apple-touch-icon-144-precomposed.png">
+
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  </head>
+<body>
+  <aside class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      
+        
+        <div class="author-image">
+          <img src="http://hgmiguel.mx/img/perfil.jpg" class="img-circle img-headshot center" alt="Profile Picture">
+        </div>
+        
+      
+
+      <h1>hgmiguel.MX</h1>
+
+      
+      <p class="lead">DevOps practitioner</p>
+      
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="http://hgmiguel.mx/">Home</a>
+        </li>
+        <li>
+          <a href="/post/"> Blog </a>
+        </li><li>
+          <a href="/about/"> About </a>
+        </li><li>
+          <a href="/donate/"> Want to donate? </a>
+        </li>
+      </ul>
+    </nav>
+
+    <section class="social-icons">
+      
+      <a href="hgmiguel" rel="me" title="Linkedin">
+        <i class="fab fa-linkedin" aria-hidden="true"></i>
+      </a>
+      
+      <a href="hgmiguel" rel="me" title="GitHub">
+        <i class="fab fa-github" aria-hidden="true"></i>
+      </a>
+      
+      <a href="hgmiguel" rel="me" title="Twitter">
+        <i class="fab fa-twitter" aria-hidden="true"></i>
+      </a>
+      
+    </section>
+  </div>
+</aside>
+
+
+  <main class="content container">
+  <div class="post">
+  <h1>S3 bucket with hash postfix </h1>
+
+  <div class="post-date">
+    <time datetime="2020-03-28T15:59:13-0400">Mar 28, 2020</time> · 3 min read
+  </div>
+
+  
+
+<p>Reference:</p>
+
+<ul>
+<li>github repository: <a href="https://github.com/hgmiguel/cdk_labs/releases/tag/v1.0">https://github.com/hgmiguel/cdk_labs/releases/tag/v1.0</a></li>
+<li>ckd version: 1.31.0 (build 8f3ac79)</li>
+</ul>
+
+<p>The purpose of this laboratory is to create a S3 bucket with a random hash suffix, this hash need to be computed at the creation moment and for further updates it will be preserve.</p>
+
+<p>I tried to put the suffix with a simple hash, but immediately we can notice that the suffix change every time.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">S3BucketStack</span>(core<span style="color:#f92672">.</span>Stack):
+    <span style="color:#66d9ef">def</span> __init__(self, scope: core<span style="color:#f92672">.</span>Construct, id: str, <span style="color:#f92672">**</span>kwargs) <span style="color:#f92672">-&gt;</span> None:
+        super()<span style="color:#f92672">.</span>__init__(scope, id, <span style="color:#f92672">**</span>kwargs)
+
+<span style="display:block;width:100%;background-color:#3c3d38">        <span style="color:#75715e">#create an S3 bucket</span>
+</span>        hash <span style="color:#f92672">=</span> uuid<span style="color:#f92672">.</span>uuid4()<span style="color:#f92672">.</span>hex[:<span style="color:#ae81ff">6</span>]
+<span style="display:block;width:100%;background-color:#3c3d38">        bucket_name <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>node<span style="color:#f92672">.</span>try_get_context(<span style="color:#e6db74">&#34;bucket_name&#34;</span>)
+</span>        s3Bucket <span style="color:#f92672">=</span> s3<span style="color:#f92672">.</span>Bucket(self, <span style="color:#e6db74">&#39;Bucket&#39;</span>, bucket_name<span style="color:#f92672">=</span>f<span style="color:#e6db74">&#39;{bucket_name}-{hash}&#39;</span>)
+        core<span style="color:#f92672">.</span>Tag<span style="color:#f92672">.</span>add(s3Bucket, <span style="color:#e6db74">&#34;key&#34;</span>, <span style="color:#e6db74">&#34;value&#34;</span>)</code></pre></div>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"> <span style="color:#f92672">(</span>master **<span style="color:#f92672">)</span>$ cdk --profile hgmiguel.mx diff
+Stack cdk-labs
+Resources
+<span style="color:#f92672">[</span>~<span style="color:#f92672">]</span> AWS::Bucket Bucket Bucket83908E77 replace
+ └─ <span style="color:#f92672">[</span>~<span style="color:#f92672">]</span> BucketName <span style="color:#f92672">(</span>requires replacement<span style="color:#f92672">)</span>
+     ├─ <span style="color:#f92672">[</span>-<span style="color:#f92672">]</span> hgmiguel.mx.test
+<span style="display:block;width:100%;background-color:#3c3d38">     └─ <span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> hgmiguel.mx.test-1a04f6</span></code></pre></div>
+
+<p>In the next execution the hash value change again.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"> <span style="color:#f92672">(</span>master **<span style="color:#f92672">)</span>$ cdk --profile hgmiguel.mx diff
+Stack cdk-labs
+Resources
+<span style="color:#f92672">[</span>~<span style="color:#f92672">]</span> AWS::Bucket Bucket Bucket83908E77 replace
+ └─ <span style="color:#f92672">[</span>~<span style="color:#f92672">]</span> BucketName <span style="color:#f92672">(</span>requires replacement<span style="color:#f92672">)</span>
+     ├─ <span style="color:#f92672">[</span>-<span style="color:#f92672">]</span> hgmiguel.mx.test
+<span style="display:block;width:100%;background-color:#3c3d38">     └─ <span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> hgmiguel.mx.test-ba38c8</span></code></pre></div>
+
+<p>I tried to archive this only with CDK but I didn&rsquo;t make it. It was so difficult to create the parameter store at the beginning that I abandoned quickly.</p>
+
+<p>I had thought about integrate sdk with boto3, and that made it.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_hash</span>(self, bucket_name):
+        client <span style="color:#f92672">=</span> boto3<span style="color:#f92672">.</span>client(<span style="color:#e6db74">&#39;ssm&#39;</span>)
+        s3_hash_parameter <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>node<span style="color:#f92672">.</span>try_get_context(<span style="color:#e6db74">&#34;s3_hash_parameter&#34;</span>)
+        <span style="color:#66d9ef">try</span>:
+            response <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>get_parameter(
+                Name<span style="color:#f92672">=</span>s3_hash_parameter,
+                WithDecryption<span style="color:#f92672">=</span>True
+            )
+
+            s3_hashes <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(response[<span style="color:#e6db74">&#39;Parameter&#39;</span>][<span style="color:#e6db74">&#39;Value&#39;</span>])
+            <span style="color:#66d9ef">if</span> bucket_name <span style="color:#f92672">in</span> s3_hashes:
+                <span style="color:#66d9ef">return</span> s3_hashes[bucket_name]
+            <span style="color:#66d9ef">else</span>:
+                s3_hashes[bucket_name] <span style="color:#f92672">=</span> uuid<span style="color:#f92672">.</span>uuid4()<span style="color:#f92672">.</span>hex[:<span style="color:#ae81ff">6</span>]
+        <span style="color:#66d9ef">except</span>  <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+            <span style="color:#66d9ef">print</span>(e)
+            s3_hashes <span style="color:#f92672">=</span> {bucket_name: uuid<span style="color:#f92672">.</span>uuid4()<span style="color:#f92672">.</span>hex[:<span style="color:#ae81ff">6</span>]}
+
+        response <span style="color:#f92672">=</span> client<span style="color:#f92672">.</span>put_parameter(
+            Name<span style="color:#f92672">=</span>s3_hash_parameter,
+            Value<span style="color:#f92672">=</span>json<span style="color:#f92672">.</span>dumps(s3_hashes),
+            Type<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;SecureString&#39;</span>,
+            Overwrite<span style="color:#f92672">=</span>True,
+            Tier<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Intelligent-Tiering&#39;</span>
+        )
+
+        <span style="color:#66d9ef">return</span> s3_hashes[bucket_name]</code></pre></div>
+
+<p>At the moment of synth we can observe that the parameter store was created also the hash value was saved.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"><span style="color:#f92672">(</span>master **<span style="color:#f92672">)</span>$ cdk --profile hgmiguel.mx synth
+An error occurred <span style="color:#f92672">(</span>ParameterNotFound<span style="color:#f92672">)</span> when calling the GetParameter operation:
+<span style="display:block;width:100%;background-color:#3c3d38">c6e230
+</span>Resources:
+  Bucket83908E77:
+    Type: AWS::Bucket
+    Properties:
+      BucketName: hgmiguel.mx.test-c6e230
+      Tags:
+        - Key: key
+          Value: value
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:</code></pre></div>
+
+<p><img src="/content/post/s3_lab/parameter_store.png" alt="Parameter Store" /></p>
+
+<p>If we execute the synt again, we can notice that the hash is preserved</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"> <span style="color:#f92672">(</span>master **<span style="color:#f92672">)</span>$ cdk --profile hgmiguel.mx synth
+<span style="display:block;width:100%;background-color:#3c3d38">c6e230
+</span>Resources:
+  Bucket83908E77:
+    Type: AWS::Bucket
+    Properties:
+      BucketName: hgmiguel.mx.test-c6e230
+      Tags:
+        - Key: key
+          Value: value</code></pre></div>
+
+<p>Now we can procced to do the deploy
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"> <span style="color:#f92672">(</span>master **<span style="color:#f92672">)</span>$ cdk deploy --profile hgmiguel.mx
+<span style="display:block;width:100%;background-color:#3c3d38">c6e230
+</span>cdk-labs: deploying...
+cdk-labs: creating CloudFormation changeset...
+ <span style="color:#ae81ff">0</span>/3 | <span style="color:#ae81ff">107</span> PM | CREATE_IN_PROGRESS   | AWS::Metadata | CDKMetadata
+ <span style="color:#ae81ff">0</span>/3 | <span style="color:#ae81ff">107</span> PM | CREATE_IN_PROGRESS   | AWS::Bucket    | Bucket <span style="color:#f92672">(</span>Bucket83908E77<span style="color:#f92672">)</span>
+ <span style="color:#ae81ff">0</span>/3 | <span style="color:#ae81ff">108</span> PM | CREATE_IN_PROGRESS   | AWS::Bucket    | Bucket <span style="color:#f92672">(</span>Bucket83908E77<span style="color:#f92672">)</span> Resource creation Initiated
+ <span style="color:#ae81ff">0</span>/3 | <span style="color:#ae81ff">109</span> PM | CREATE_IN_PROGRESS   | AWS::Metadata | CDKMetadata Resource creation Initiated
+ <span style="color:#ae81ff">1</span>/3 | <span style="color:#ae81ff">109</span> PM | CREATE_COMPLETE      | AWS::Metadata | CDKMetadata
+ <span style="color:#ae81ff">2</span>/3 | <span style="color:#ae81ff">129</span> PM | CREATE_COMPLETE      | AWS::Bucket    | Bucket <span style="color:#f92672">(</span>Bucket83908E77<span style="color:#f92672">)</span>
+ <span style="color:#ae81ff">3</span>/3 | <span style="color:#ae81ff">131</span> PM | CREATE_COMPLETE      | AWS::Stack | cdk-labs
+
+ ✅  cdk-labs    </code></pre></div></p>
+
+<p><img src="/content/post/s3_lab/s3_hgmiguel.png" alt="S3 bucket" /></p>
+
+<p>If we made a change like eneable encryptation, if we made a diff we can notice that cdk use the same hash.</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh"> <span style="color:#f92672">(</span>master **<span style="color:#f92672">)</span>$ cdk diff --profile hgmiguel.mx
+<span style="display:block;width:100%;background-color:#3c3d38">c6e230
+</span>Stack cdk-labs
+IAM Statement Changes
+
+.....
+<span style="color:#f92672">(</span>Changes happen here<span style="color:#f92672">)</span>
+....
+
+<span style="color:#f92672">(</span>NOTE: There may be security-related changes not in this list. See https://github.com/aws/aws-cdk/issues/1299<span style="color:#f92672">)</span>
+
+Resources
+<span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> AWS::Key Bucket/Key BucketKey7E4AEAB8
+<span style="color:#f92672">[</span>~<span style="color:#f92672">]</span> AWS::Bucket Bucket Bucket83908E77
+ └─ <span style="color:#f92672">[</span>+<span style="color:#f92672">]</span> BucketEncryption
+     └─ <span style="color:#f92672">{</span><span style="color:#e6db74">&#34;ServerSideEncryptionConfiguration&#34;</span>:<span style="color:#f92672">[{</span><span style="color:#e6db74">&#34;ServerSideEncryptionByDefault&#34;</span>:<span style="color:#f92672">{</span><span style="color:#e6db74">&#34;KMSMasterKeyID&#34;</span>:<span style="color:#f92672">{</span><span style="color:#e6db74">&#34;Fn::GetAtt&#34;</span>:<span style="color:#f92672">[</span><span style="color:#e6db74">&#34;BucketKey7E4AEAB8&#34;</span>,<span style="color:#e6db74">&#34;Arn&#34;</span><span style="color:#f92672">]}</span>,<span style="color:#e6db74">&#34;SSEAlgorithm&#34;</span>:<span style="color:#e6db74">&#34;aws:kms&#34;</span><span style="color:#f92672">}}]}</span></code></pre></div>
+
+<p>If we made the deploy, the change is applied on the same bucket</p>
+
+<p><img src="/content/post/s3_lab/s3_encryptation.png" alt="S3 encryptation" /></p>
+
+<h2 id="issues">Issues</h2>
+
+<p>cdk destroy doesn&rsquo;t work any more.
+<code>2020-03-28 14:02:01 UTC-0600 Bucket83908E77  CREATE_FAILED   hgmiguel.mx.test-c6e230 already exists</code></p>
+
+</div>
+
+
+  </main>
+
+  <footer>
+  <div class="copyright">
+    &copy; Miguel Angel Huerta González 2020 · <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>
+  </div>
+</footer>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js"
+          integrity="sha256-MAgcygDRahs+F/Nk5Vz387whB4kSK9NXlDN3w58LLq0="
+          crossorigin="anonymous"></script>
+
+  
+
+  
+</body>
+</html>
