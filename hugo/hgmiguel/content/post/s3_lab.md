@@ -2,7 +2,7 @@
 categories = ["aws", "cdk", "laboratory"]
 comments = true
 date = "2020-03-28T15:59:13-04:00"
-draft = true
+draft = false 
 showpagemeta = false
 showcomments = true
 slug = ""
@@ -12,11 +12,15 @@ description = "How to create an S3 bucket with cdk"
 
 +++
 
+Reference:
+
+* github repository: https://github.com/hgmiguel/cdk_labs/releases/tag/v1.0
+* ckd version: 1.31.0 (build 8f3ac79)
+
 The purpose of this laboratory is to create a S3 bucket with a random hash suffix, this hash need to be computed at the creation moment and for further updates it will be preserve.
 
 I tried to put the suffix with a simple hash, but immediately we can notice that the suffix change every time.
 
-Al intentar ponerle un sufijo al bucket obtenemos este en cada ejecución:
 {{< highlight python "hl_lines=5 7">}}
 class S3BucketStack(core.Stack):
     def __init__(self, scope: core.Construct, id: str, **kwargs) -> None:
@@ -40,7 +44,7 @@ Resources
      └─ [+] hgmiguel.mx.test-1a04f6
 {{< / highlight >}}
 
-En la siguiente ejecución el hash vuelve a cambiar
+In the next execution the hash value change again.
 
 {{< highlight sh "hl_lines=7">}}
  (master **)$ cdk --profile hgmiguel.mx diff
@@ -86,8 +90,10 @@ I had thought about integrate sdk with boto3, and that made it.
         return s3_hashes[bucket_name]
 {{< / highlight >}}
 
-Al aplicar la parte de synth vemos que nos crea el *parameter store* y nos guarda el hash 
-```sh (master **)$ cdk --profile hgmiguel.mx synth
+At the moment of synth we can observe that the parameter store was created also the hash value was saved.
+
+{{< highlight sh "hl_lines=3">}}
+(master **)$ cdk --profile hgmiguel.mx synth
 An error occurred (ParameterNotFound) when calling the GetParameter operation:
 c6e230
 Resources:
@@ -101,13 +107,13 @@ Resources:
     UpdateReplacePolicy: Retain
     DeletionPolicy: Retain
     Metadata:
-```
+{{< / highlight >}}
 
-Insertar imágen aqui.
+![Parameter Store](/content/post/s3_lab/parameter_store.png)
 
-al volver a ejecutar vemos que conservamos el hash 
+If we execute the synt again, we can notice that the hash is preserved
 
-```sh 
+{{< highlight sh "hl_lines=2">}}
  (master **)$ cdk --profile hgmiguel.mx synth
 c6e230
 Resources:
@@ -118,10 +124,10 @@ Resources:
       Tags:
         - Key: key
           Value: value
-```
+{{< / highlight >}}
 
-Y al hacer el deploy
-```sh
+Now we can procced to do the deploy
+{{< highlight sh "hl_lines=2">}}
  (master **)$ cdk deploy --profile hgmiguel.mx
 c6e230
 cdk-labs: deploying...
@@ -134,36 +140,24 @@ cdk-labs: creating CloudFormation changeset...
  2/3 | 1:11:29 PM | CREATE_COMPLETE      | AWS::S3::Bucket    | Bucket (Bucket83908E77)
  3/3 | 1:11:31 PM | CREATE_COMPLETE      | AWS::CloudFormation::Stack | cdk-labs
 
- ✅  cdk-labs    `
- ```
-Insertar imágen del bucket
+ ✅  cdk-labs    
 
+{{< / highlight >}}
 
-Si hacemos un cambio como activar la encripcion en el bucket al hacer el diff vemos que sigue ocupando el mismo hash
-```sh
+![S3 bucket](/content/post/s3_lab/s3_hgmiguel.png)
+
+If we made a change like eneable encryptation, if we made a diff we can notice that cdk use the same hash.
+
+{{< highlight sh "hl_lines=2">}}
  (master **)$ cdk diff --profile hgmiguel.mx
 c6e230
 Stack cdk-labs
 IAM Statement Changes
-┌───┬───────────────────┬────────┬──────────────────────────────────────────────────────────────────────────────────────────────┬───────────────────────────────────────────────────────────────────────────────────────────────┬───────────┐
-│   │ Resource          │ Effect │ Action                                                                                       │ Principal                                                                                     │ Condition │
-├───┼───────────────────┼────────┼──────────────────────────────────────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────┼───────────┤
-│ + │ ${Bucket/Key.Arn} │ Allow  │ kms:CancelKeyDeletion                                                                        │ AWS:arn:${AWS::Partition}:iam::408460586533:root                                              │           │
-│   │                   │        │ kms:Create*                                                                                  │                                                                                               │           │
-│   │                   │        │ kms:Delete*                                                                                  │                                                                                               │           │
-│   │                   │        │ kms:Describe*                                                                                │                                                                                               │           │
-│   │                   │        │ kms:Disable*                                                                                 │                                                                                               │           │
-│   │                   │        │ kms:Enable*                                                                                  │                                                                                               │           │
-│   │                   │        │ kms:GenerateDataKey                                                                          │                                                                                               │           │
-│   │                   │        │ kms:Get*                                                                                     │                                                                                               │           │
-│   │                   │        │ kms:List*                                                                                    │                                                                                               │           │
-│   │                   │        │ kms:Put*                                                                                     │                                                                                               │           │
-│   │                   │        │ kms:Revoke*                                                                                  │                                                                                               │           │
-│   │                   │        │ kms:ScheduleKeyDeletion                                                                      │                                                                                               │           │
-│   │                   │        │ kms:TagResource                                                                              │                                                                                               │           │
-│   │                   │        │ kms:UntagResource                                                                            │                                                                                               │           │
-│   │                   │        │ kms:Update*                                                                                  │                                                                                               │           │
-└───┴───────────────────┴────────┴──────────────────────────────────────────────────────────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────┴───────────┘
+
+.....
+(Changes happen here)
+....
+
 (NOTE: There may be security-related changes not in this list. See https://github.com/aws/aws-cdk/issues/1299)
 
 Resources
@@ -171,11 +165,11 @@ Resources
 [~] AWS::S3::Bucket Bucket Bucket83908E77
  └─ [+] BucketEncryption
      └─ {"ServerSideEncryptionConfiguration":[{"ServerSideEncryptionByDefault":{"KMSMasterKeyID":{"Fn::GetAtt":["BucketKey7E4AEAB8","Arn"]},"SSEAlgorithm":"aws:kms"}}]}
-```
+{{< / highlight >}}
 
-Cuando hacemos el deploy el cambio se aplica sobre el bucket 
+If we made the deploy, the change is applied on the same bucket
 
-Insertar imagen aqui.
+![S3 encryptation](/content/post/s3_lab/s3_encryptation.png)
 
 ## Issues
 cdk destroy doesn't work any more.

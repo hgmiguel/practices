@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on hgmiguel.MX</title>
+    <link>http://hgmiguel.mx/tags/</link>
+    <description>Recent content in Tags on hgmiguel.MX</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 28 Mar 2020 15:59:13 -0400</lastBuildDate>
+    
+	<atom:link href="http://hgmiguel.mx/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>aws</title>
+      <link>http://hgmiguel.mx/tags/aws/</link>
+      <pubDate>Sat, 28 Mar 2020 15:59:13 -0400</pubDate>
+      
+      <guid>http://hgmiguel.mx/tags/aws/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>cdk</title>
+      <link>http://hgmiguel.mx/tags/cdk/</link>
+      <pubDate>Sat, 28 Mar 2020 15:59:13 -0400</pubDate>
+      
+      <guid>http://hgmiguel.mx/tags/cdk/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>python</title>
+      <link>http://hgmiguel.mx/tags/python/</link>
+      <pubDate>Sat, 28 Mar 2020 15:59:13 -0400</pubDate>
+      
+      <guid>http://hgmiguel.mx/tags/python/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>s3</title>
+      <link>http://hgmiguel.mx/tags/s3/</link>
+      <pubDate>Sat, 28 Mar 2020 15:59:13 -0400</pubDate>
+      
+      <guid>http://hgmiguel.mx/tags/s3/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ssm</title>
+      <link>http://hgmiguel.mx/tags/ssm/</link>
+      <pubDate>Sat, 28 Mar 2020 15:59:13 -0400</pubDate>
+      
+      <guid>http://hgmiguel.mx/tags/ssm/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>donate</title>
+      <link>http://hgmiguel.mx/tags/donate/</link>
+      <pubDate>Mon, 13 Feb 2017 19:41:11 -0600</pubDate>
+      
+      <guid>http://hgmiguel.mx/tags/donate/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tip</title>
+      <link>http://hgmiguel.mx/tags/tip/</link>
+      <pubDate>Mon, 13 Feb 2017 19:41:11 -0600</pubDate>
+      
+      <guid>http://hgmiguel.mx/tags/tip/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
